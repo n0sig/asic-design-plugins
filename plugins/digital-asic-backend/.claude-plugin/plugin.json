@@ -1,5 +1,5 @@
 {
-  "name": "asic-backend",
+  "name": "digital-asic-backend",
   "version": "1.0.0",
   "description": "ASIC backend flow automation for Synopsys Fusion Compiler, StarRC, PrimeTime, and VCS. Provides skills for running and managing the complete digital place-and-route, parasitic extraction, timing signoff, ECO convergence, and post-layout simulation workflows.",
   "author": {
