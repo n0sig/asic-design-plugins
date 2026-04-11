@@ -1,0 +1,22 @@
+{
+  "name": "asic-design-plugins",
+  "owner": {
+    "name": "szj",
+    "email": "yhszj2013@hotmail.com"
+  },
+  "version": "1.0.0",
+  "description": "A marketplace for discovering and installing Claude Code plugins",
+  "plugins": [
+    {
+      "name": "digital-asic-backend",
+      "source": "./plugins/digital-asic-backend",
+      "version": "1.0.0",
+      "description": "ASIC backend flow automation for Synopsys Fusion Compiler, StarRC, PrimeTime, and VCS. Provides skills for running and managing the complete digital place-and-route, parasitic extraction, timing signoff, ECO convergence, and post-layout simulation workflows.",
+      "author": {
+        "name": "szj",
+        "email": "yhszj2013@hotmail.com"
+      },
+      "keywords": ["asic", "backend", "eda", "fusion-compiler", "primetime", "starrc", "vcs", "digital-design", "place-and-route", "timing-signoff"]
+    }
+  ]
+}
