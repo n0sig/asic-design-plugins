@@ -1,7 +1,7 @@
 ---
 name: run-fc-step
 description: Run Single FC Step
-argument-hint: <step> (design_setup|floorplan|synthesis|clocktree|routing|dfm|output)
+argument-hint: <step> (design_setup|floorplan|synthesis|placement|clocktree|routing|dfm|output)
 allowed-tools: [Read, Glob, Grep, Bash, Skill]
 ---
 
@@ -9,12 +9,12 @@ allowed-tools: [Read, Glob, Grep, Bash, Skill]
 
 Run a single Fusion Compiler step with backup and report checking.
 
-**Argument**: `$ARGUMENTS` = step name. One of: `design_setup`, `floorplan`, `synthesis`, `clocktree`, `routing`, `dfm`, `output`
+**Argument**: `$ARGUMENTS` = step name. One of: `design_setup`, `floorplan`, `synthesis`, `placement`, `clocktree`, `routing`, `dfm`, `output`
 
 ## Setup
 
-1. Find the project root by looking for the `fc/scripts/fc_setup.tcl` file starting from the current directory.
-2. Read `fc/scripts/fc_setup.tcl` to extract `DESIGN_NAME` and `PROJECT_PATH`.
+1. Find the project root by looking for the `fc/scripts/setup.tcl` file starting from the current directory.
+2. Read `fc/scripts/setup.tcl` to extract `DESIGN_NAME` and `PROJECT_PATH`.
 
 ## Step Prerequisite Map
 
@@ -24,7 +24,8 @@ Each step requires a checkpoint from the previous step:
 |------|-------------------|-------------------|
 | `design_setup` | (none -- creates library from scratch) | `${DESIGN_NAME}_initial` |
 | `floorplan` | `${DESIGN_NAME}_initial` | `${DESIGN_NAME}_floorplan` |
-| `synthesis` | `${DESIGN_NAME}_floorplan` | `${DESIGN_NAME}_compile_fusion`, `${DESIGN_NAME}_placement` |
+| `synthesis` | `${DESIGN_NAME}_floorplan` | `${DESIGN_NAME}_synthesis` |
+| `placement` | `${DESIGN_NAME}_synthesis` | `${DESIGN_NAME}_placement` |
 | `clocktree` | `${DESIGN_NAME}_placement` | `${DESIGN_NAME}_clocktree` |
 | `routing` | `${DESIGN_NAME}_clocktree` | `${DESIGN_NAME}_route` |
 | `dfm` | `${DESIGN_NAME}_route` | `${DESIGN_NAME}_dfm` |
@@ -45,12 +46,12 @@ Each step requires a checkpoint from the previous step:
 
 ```bash
 cd $PROJECT_PATH/fc && mkdir -p scripts report output temp
-cd $PROJECT_PATH/fc/temp && fc_shell -f ../scripts/fc_run_${STEP}.tcl 2>&1 | tee ../report/run_${STEP}.log
+cd $PROJECT_PATH/fc/temp && fc_shell -f ../scripts/runners/run_${STEP}.tcl 2>&1 | tee ../report/run_${STEP}.log
 ```
 
 For longer steps (`synthesis`, `clocktree`, `routing`), consider using `run_in_background: true` or the nohup pattern:
 ```bash
-cd $PROJECT_PATH/fc/temp && nohup fc_shell -f ../scripts/fc_run_${STEP}.tcl > ../report/run_${STEP}.log 2>&1 &
+cd $PROJECT_PATH/fc/temp && nohup fc_shell -f ../scripts/runners/run_${STEP}.tcl > ../report/run_${STEP}.log 2>&1 &
 echo $! > /tmp/.fc_step_pid
 ```
 
@@ -64,7 +65,8 @@ After the step completes, check the appropriate reports:
 |------|-------------------------------------------|
 | `design_setup` | Verify `save_block` succeeded in log |
 | `floorplan` | Verify `save_block` succeeded in log |
-| `synthesis` | `/check-reports fc-synthesis` then `/check-reports fc-placement` |
+| `synthesis` | `/check-reports fc-synthesis` |
+| `placement` | `/check-reports fc-placement` |
 | `clocktree` | `/check-reports fc-clocktree` |
 | `routing` | `/check-reports fc-routing` |
 | `dfm` | `/check-reports fc-dfm` |

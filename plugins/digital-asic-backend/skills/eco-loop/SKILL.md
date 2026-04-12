@@ -10,8 +10,8 @@ Run the iterative ECO convergence loop: StarRC -> PrimeTime -> FC ECO. Maximum 5
 
 ## Setup
 
-1. Find the project root by looking for the `fc/scripts/fc_setup.tcl` file starting from the current directory.
-2. Read `fc/scripts/fc_setup.tcl` to extract `DESIGN_NAME` and `PROJECT_PATH`.
+1. Find the project root by looking for the `fc/scripts/setup.tcl` file starting from the current directory.
+2. Read `fc/scripts/setup.tcl` to extract `DESIGN_NAME` and `PROJECT_PATH`.
 
 ## Prerequisites
 

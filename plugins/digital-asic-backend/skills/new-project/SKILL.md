@@ -73,14 +73,14 @@ Present a summary table:
 ## Step 2: Create Directory Structure
 
 ```bash
-mkdir -p $PROJECT_PATH/{hdl,fc/{scripts,report,output,temp},starrc/{scripts,spef,temp},pt/{scripts,report,result,work,temp},vcs/post}
+mkdir -p $PROJECT_PATH/{hdl,fc/{scripts/{runners,flow,steps,constraints},report,output,temp},starrc/{scripts,spef,temp},pt/{scripts,report,result,work,temp},vcs/post}
 ```
 
 ## Step 3: Generate FC Scripts
 
 Generate the following files using the confirmed PDK paths. Use the existing `adc` project scripts as templates but substitute all paths and design names.
 
-### `fc/scripts/fc_setup.tcl`
+### `fc/scripts/setup.tcl`
 Variable-only setup (no create_lib, no flow invocation):
 - `DESIGN_NAME`, `PROJECT_PATH`, `LIBRARY_PATH`
 - `SEARCH_PATH` pointing to DB and SDB directories, plus `$PROJECT_PATH/hdl`, `$PROJECT_PATH/fc/scripts`, `$PROJECT_PATH/fc/report`, `$PROJECT_PATH/fc/output`
@@ -93,19 +93,29 @@ Variable-only setup (no create_lib, no flow invocation):
 - `set_host_options -max_cores 32`
 - Verify settings echo block
 
-### `fc/scripts/fc_run_full.tcl`
-Sources fc_setup.tcl, creates library, sources fc_flow.tcl.
+### `fc/scripts/runners/run_full.tcl`
+Sources `../setup.tcl`, creates library, sources `../flow/flow.tcl`.
 
-### `fc/scripts/fc_run_design_setup.tcl`
-Sources fc_setup.tcl, creates library, sources design_setup.tcl.
+### `fc/scripts/runners/run_design_setup.tcl`
+Sources `../setup.tcl`, creates library, sources `../steps/design_setup.tcl`.
 
-### `fc/scripts/fc_run_{floorplan,synthesis,clocktree,routing,dfm,output}.tcl`
-Each: sources fc_setup.tcl, opens library, sources the step script.
+### `fc/scripts/runners/run_{floorplan,synthesis,placement,clocktree,routing,dfm,output}.tcl`
+Each: sources `../setup.tcl`, opens library, sources the corresponding step script from `../steps/`.
 
-### `fc/scripts/fc_flow.tcl`
-Sources all step scripts in order (design_setup through output).
+### `fc/scripts/flow/flow.tcl`
+Sources all step scripts in order (design_setup through output, with placement between synthesis and clocktree):
+```tcl
+source ../scripts/steps/design_setup.tcl
+source ../scripts/steps/floorplan.tcl
+source ../scripts/steps/synthesis.tcl
+source ../scripts/steps/placement.tcl
+source ../scripts/steps/clocktree.tcl
+source ../scripts/steps/routing.tcl
+source ../scripts/steps/dfm.tcl
+source ../scripts/steps/output.tcl
+```
 
-### `fc/scripts/design_setup.tcl` (PLACEHOLDER)
+### `fc/scripts/steps/design_setup.tcl` (PLACEHOLDER)
 ```tcl
 ######################################################################
 # Design Setup -- Read RTL, Elaborate, Apply Constraints
@@ -132,8 +142,8 @@ set_voltage 1.20
 
 set_app_options -name time.remove_clock_reconvergence_pessimism -value true
 
-source ../scripts/fc_clk_con.tcl
-source ../scripts/fc_phy_con.tcl
+source ../scripts/constraints/clk.tcl
+source ../scripts/constraints/physical.tcl
 
 report_ref_libs
 
@@ -141,7 +151,7 @@ save_block -as ${DESIGN_NAME}_initial
 save_lib
 ```
 
-### `fc/scripts/floorplan.tcl` (PLACEHOLDER)
+### `fc/scripts/steps/floorplan.tcl` (PLACEHOLDER)
 ```tcl
 # TODO: User must set core dimensions and pin placement
 open_block ${DESIGN_NAME}_initial
@@ -151,7 +161,7 @@ initialize_floorplan -control_type core \
     -shape R \
     -side_length {100 100}
 
-source ../scripts/io_floorplan.tcl
+source ../scripts/steps/floorplan_io.tcl
 
 connect_pg_net -automatic
 
@@ -163,14 +173,14 @@ save_block -as ${DESIGN_NAME}_floorplan
 save_lib
 ```
 
-### `fc/scripts/io_floorplan.tcl` (PLACEHOLDER)
+### `fc/scripts/steps/floorplan_io.tcl` (PLACEHOLDER)
 ```tcl
 # TODO: User must define pin placement
 # Use /modify-floorplan skill to generate pin placement from natural language
 place_pins -self
 ```
 
-### `fc/scripts/fc_clk_con.tcl` (PLACEHOLDER)
+### `fc/scripts/constraints/clk.tcl` (PLACEHOLDER)
 ```tcl
 # TODO: User must define clock constraints
 # Example:
@@ -180,20 +190,41 @@ place_pins -self
 # set_output_delay [expr {0.1*$CLK_PERIOD}] -clock clk [all_outputs]
 ```
 
-### `fc/scripts/fc_phy_con.tcl` (PLACEHOLDER)
+### `fc/scripts/constraints/physical.tcl` (PLACEHOLDER)
 ```tcl
 # Physical constraints (dont_use cells, etc.)
 # Example:
 # set_dont_use [get_lib_cells */AOI222*]
 ```
 
-### `fc/scripts/synthesis.tcl`, `clocktree.tcl`, `routing.tcl`, `dfm.tcl`, `output.tcl`
+### `fc/scripts/steps/synthesis.tcl`, `fc/scripts/steps/clocktree.tcl`, `fc/scripts/steps/routing.tcl`, `fc/scripts/steps/dfm.tcl`, `fc/scripts/steps/output.tcl`
 Copy the standard templates from the adc project. These are generally design-independent. Read the corresponding scripts from the adc project at `/ic_data/szj/digital/project/202605-nr512/adc/fc/scripts/` and replicate them with `$DESIGN_NAME` variable references (they already use variables, so they're portable).
 
-### `fc/scripts/fc_setup_eco.tcl`, `fc/scripts/eco_flow.tcl`
-Same as adc project templates.
+For `steps/synthesis.tcl`: ensure it saves the checkpoint as `${DESIGN_NAME}_synthesis` and report files as `timing_synthesis.rpt`, `qor_synthesis.rpt`, `power_synthesis.rpt`.
 
-### `fc/scripts/antenna_rule.tcl`
+### `fc/scripts/steps/placement.tcl` (NEW)
+Opens from the synthesis checkpoint, runs `place_opt`, and saves the placement checkpoint:
+```tcl
+open_block ${DESIGN_NAME}_synthesis
+
+place_opt
+
+save_block -as ${DESIGN_NAME}_placement
+save_lib
+```
+
+### `fc/scripts/setup_eco.tcl`
+Sources `setup.tcl` to avoid duplication, then opens the library and invokes the ECO flow:
+```tcl
+source ../scripts/setup.tcl
+open_lib $DESIGN_LIBRARY
+source ../scripts/flow/flow_eco.tcl
+```
+
+### `fc/scripts/flow/flow_eco.tcl`
+Same as adc project template.
+
+### `fc/scripts/constraints/antenna_rules.tcl`
 If found in PDK, copy it. Otherwise, use the GF130 antenna rules from the adc project as a starting template.
 
 ## Step 4: Generate StarRC Scripts
@@ -262,13 +293,13 @@ PDK: $PDK_PATH
 
 TODO for the user:
 [ ] Place RTL files in hdl/
-[ ] Edit fc/scripts/design_setup.tcl: add RTL file list to analyze command
-[ ] Edit fc/scripts/fc_clk_con.tcl: define clock, I/O delays, loads
-[ ] Edit fc/scripts/floorplan.tcl: set core dimensions (or use /modify-floorplan)
-[ ] Edit fc/scripts/io_floorplan.tcl: set pin placement (or use /modify-floorplan)
-[ ] Edit fc/scripts/fc_phy_con.tcl: add physical constraints if needed
+[ ] Edit fc/scripts/steps/design_setup.tcl: add RTL file list to analyze command
+[ ] Edit fc/scripts/constraints/clk.tcl: define clock, I/O delays, loads
+[ ] Edit fc/scripts/steps/floorplan.tcl: set core dimensions (or use /modify-floorplan)
+[ ] Edit fc/scripts/steps/floorplan_io.tcl: set pin placement (or use /modify-floorplan)
+[ ] Edit fc/scripts/constraints/physical.tcl: add physical constraints if needed
 [ ] Create hdl/verilog_file_post.f for VCS (post-layout file list)
-[ ] Review antenna_rule.tcl for your process
+[ ] Review fc/scripts/constraints/antenna_rules.tcl for your process
 
 Once done, run: /run-fc to start the flow.
 ```

@@ -18,8 +18,8 @@ Examples:
 
 ## Setup
 
-1. Find the project root by looking for the `fc/scripts/fc_setup.tcl` file starting from the current directory.
-2. Read `fc/scripts/fc_setup.tcl` to extract `DESIGN_NAME` and `PROJECT_PATH`.
+1. Find the project root by looking for the `fc/scripts/setup.tcl` file starting from the current directory.
+2. Read `fc/scripts/setup.tcl` to extract `DESIGN_NAME` and `PROJECT_PATH`.
 3. Read the current `fc/scripts/floorplan.tcl` and `fc/scripts/io_floorplan.tcl` to understand existing settings.
 4. Read RTL files in `hdl/` to get the complete list of ports (input/output/inout with bit widths).
 

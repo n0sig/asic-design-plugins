@@ -13,14 +13,14 @@ Parse and present reports from any stage of the ASIC backend flow.
 
 ## Setup
 
-1. Find the project root by looking for the `fc/scripts/fc_setup.tcl` file starting from the current directory.
-2. Read `fc/scripts/fc_setup.tcl` to extract `DESIGN_NAME` and `PROJECT_PATH`.
+1. Find the project root by looking for the `fc/scripts/setup.tcl` file starting from the current directory.
+2. Read `fc/scripts/setup.tcl` to extract `DESIGN_NAME` and `PROJECT_PATH`.
 
 ## Stage-to-Report Mapping
 
 | Stage | Report Files (under `fc/report/` unless noted) |
 |-------|-----------------------------------------------|
-| `fc-synthesis` | `timing_compile_fusion.rpt`, `qor_compile_fusion.rpt`, `power_compile_fusion.rpt` |
+| `fc-synthesis` | `timing_synthesis.rpt`, `qor_synthesis.rpt`, `power_synthesis.rpt` |
 | `fc-placement` | `placement_timing.rpt`, `placement_qor.rpt` |
 | `fc-clocktree` | `timing_cts.rpt`, `timing_clock_opt.rpt`, `timing_clock_opt_hold.rpt` |
 | `fc-routing` | `route_timing.rpt`, `route_timing_hold.rpt`, `route_qor.rpt`, `route_drc.rpt` |
