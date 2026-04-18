@@ -7,9 +7,8 @@
 # Read and Elaborate RTL
 ######################################################################
 # Read all SystemVerilog sources listed in hdl/filelist.f.
-# -F resolves relative paths inside the filelist relative to the
-#    filelist's own directory (hdl/), so entries like "top.sv" or
-#    "sub/block.sv" work without any absolute path prefix.
+# -f reads a VCS command file. Use absolute paths inside the filelist
+#    to avoid ambiguity (relative paths resolve from fc/temp/).
 # Create an empty filelist if one does not already exist so that
 # subsequent steps fail with a clear error rather than a tool crash.
 
@@ -17,16 +16,15 @@ set _filelist "${PROJECT_PATH}/hdl/filelist.f"
 if {![file exists $_filelist]} {
     set _fh [open $_filelist w]
     puts $_fh "// VCS filelist — add your SystemVerilog source files below."
-    puts $_fh "// Paths are relative to this file's directory (hdl/)."
-    puts $_fh "// Example:"
-    puts $_fh "//   top.sv"
-    puts $_fh "//   sub/block.sv"
-    puts $_fh "//   +incdir+include"
+    puts $_fh "// Use absolute paths. Example:"
+    puts $_fh "//   ${PROJECT_PATH}/hdl/top.sv"
+    puts $_fh "//   ${PROJECT_PATH}/hdl/sub/block.sv"
+    puts $_fh "//   +incdir+${PROJECT_PATH}/hdl/include"
     close $_fh
-    puts "WARNING: hdl/filelist.f was missing and has been created as an empty placeholder."
-    puts "WARNING: Populate ${_filelist} with your RTL files and re-run."
+    puts "WARNING: hdl/filelist.f was missing and has been created as a placeholder."
+    puts "WARNING: Add your RTL files to ${PROJECT_PATH}/hdl/filelist.f and re-run."
 }
-analyze -vcs "-sverilog -F ${_filelist}"
+analyze -vcs "-sverilog -f ${_filelist}"
 
 elaborate $DESIGN_NAME
 set_top_module $DESIGN_NAME
