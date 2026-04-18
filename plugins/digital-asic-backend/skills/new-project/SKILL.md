@@ -124,7 +124,7 @@ PDK: $PDK_PATH (from pdk.md)
 
 TODO for the user:
 [ ] Place RTL files in hdl/
-[ ] Edit fc/scripts/stages/init.tcl: add RTL file list to analyze command
+[ ] Edit hdl/filelist.f: add your SystemVerilog source files (paths relative to hdl/)
 [ ] Edit fc/scripts/constraints/timing.tcl: define clock, I/O delays, loads
 [ ] Edit fc/scripts/stages/floorplan.tcl: set core dimensions (or use /modify-floorplan)
 [ ] Edit fc/scripts/constraints/io.tcl: set pin placement (or use /modify-floorplan)
