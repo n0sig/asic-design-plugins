@@ -113,3 +113,16 @@ Split at the checkpoint boundary:
 | `steps/placement.tcl` | `open_block ${DESIGN_NAME}_synthesis` |
 
 > The `compile_fusion` tool command (the Fusion Compiler binary call) is unchanged.
+
+---
+
+## v1.1.0
+
+See [`releases/v1.1.0.md`](releases/v1.1.0.md) for full details and migration commands.
+
+| Change | Summary |
+|--------|---------|
+| `runners/` → `flows/`, `steps/` → `stages/` | Clearer naming: flows define which stages to invoke; stages implement each PnR phase |
+| `design_setup` → `init` | Avoids naming clash with parent `setup.tcl` |
+| New skill: `discover-pdk` | One-time PDK scan writes `$PDK_PATH/pdk.md`; `new-project` reads it instead of re-scanning |
+| `antenna_rules.tcl` → placeholder | Hard-coded process rules removed; `/new-project` now copies the real file from PDK |

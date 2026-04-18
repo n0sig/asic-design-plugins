@@ -1,7 +1,7 @@
 ---
 name: run-fc-step
 description: Run Single FC Step
-argument-hint: <step> (design_setup|floorplan|synthesis|placement|clocktree|routing|dfm|output)
+argument-hint: <step> (init|floorplan|synthesis|placement|clocktree|routing|dfm|output)
 allowed-tools: [Read, Glob, Grep, Bash, Skill]
 ---
 
@@ -9,7 +9,7 @@ allowed-tools: [Read, Glob, Grep, Bash, Skill]
 
 Run a single Fusion Compiler step with backup and report checking.
 
-**Argument**: `$ARGUMENTS` = step name. One of: `design_setup`, `floorplan`, `synthesis`, `placement`, `clocktree`, `routing`, `dfm`, `output`
+**Argument**: `$ARGUMENTS` = step name. One of: `init`, `floorplan`, `synthesis`, `placement`, `clocktree`, `routing`, `dfm`, `output`
 
 ## Setup
 
@@ -22,7 +22,7 @@ Each step requires a checkpoint from the previous step:
 
 | Step | Requires Checkpoint | Produces Checkpoint |
 |------|-------------------|-------------------|
-| `design_setup` | (none -- creates library from scratch) | `${DESIGN_NAME}_initial` |
+| `init` | (none -- creates library from scratch) | `${DESIGN_NAME}_initial` |
 | `floorplan` | `${DESIGN_NAME}_initial` | `${DESIGN_NAME}_floorplan` |
 | `synthesis` | `${DESIGN_NAME}_floorplan` | `${DESIGN_NAME}_synthesis` |
 | `placement` | `${DESIGN_NAME}_synthesis` | `${DESIGN_NAME}_placement` |
@@ -33,10 +33,10 @@ Each step requires a checkpoint from the previous step:
 
 ## Pre-run Checks
 
-1. Verify the prerequisite checkpoint exists (except for `design_setup`):
+1. Verify the prerequisite checkpoint exists (except for `init`):
    - Check that `$PROJECT_PATH/fc/${DESIGN_NAME}.dlib` exists
    - The checkpoint block name should be present in the .dlib
-2. **Backup** the .dlib before running (except for `design_setup` which creates a new one):
+2. **Backup** the .dlib before running (except for `init` which creates a new one):
    ```bash
    TIMESTAMP=$(date +%Y%m%d_%H%M%S)
    cp -a $PROJECT_PATH/fc/${DESIGN_NAME}.dlib $PROJECT_PATH/fc/backup_${STEP}_${TIMESTAMP}.dlib
@@ -46,12 +46,12 @@ Each step requires a checkpoint from the previous step:
 
 ```bash
 cd $PROJECT_PATH/fc && mkdir -p scripts report output temp
-cd $PROJECT_PATH/fc/temp && fc_shell -f ../scripts/runners/run_${STEP}.tcl 2>&1 | tee ../report/run_${STEP}.log
+cd $PROJECT_PATH/fc/temp && fc_shell -f ../scripts/flows/run_${STEP}.tcl 2>&1 | tee ../report/run_${STEP}.log
 ```
 
 For longer steps (`synthesis`, `clocktree`, `routing`), consider using `run_in_background: true` or the nohup pattern:
 ```bash
-cd $PROJECT_PATH/fc/temp && nohup fc_shell -f ../scripts/runners/run_${STEP}.tcl > ../report/run_${STEP}.log 2>&1 &
+cd $PROJECT_PATH/fc/temp && nohup fc_shell -f ../scripts/flows/run_${STEP}.tcl > ../report/run_${STEP}.log 2>&1 &
 echo $! > /tmp/.fc_step_pid
 ```
 
@@ -63,7 +63,7 @@ After the step completes, check the appropriate reports:
 
 | Step | Check Reports (invoke /check-reports with) |
 |------|-------------------------------------------|
-| `design_setup` | Verify `save_block` succeeded in log |
+| `init` | Verify `save_block` succeeded in log |
 | `floorplan` | Verify `save_block` succeeded in log |
 | `synthesis` | `/check-reports fc-synthesis` |
 | `placement` | `/check-reports fc-placement` |

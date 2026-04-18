@@ -1,0 +1,39 @@
+{
+  "name": "digital-asic-backend",
+  "version": "1.1.0",
+  "description": "ASIC backend flow automation for Synopsys Fusion Compiler, StarRC, PrimeTime, and VCS.",
+  "author": {
+    "name": "szj"
+  },
+  "keywords": [
+    "asic",
+    "backend",
+    "eda",
+    "fusion-compiler",
+    "primetime",
+    "starrc",
+    "vcs",
+    "digital-design",
+    "place-and-route",
+    "timing-signoff"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Digital ASIC Backend",
+    "shortDescription": "Run place-and-route, extraction, signoff, ECO, and post-layout simulation flows.",
+    "longDescription": "Provides workflow skills for digital ASIC backend implementation with Synopsys Fusion Compiler, StarRC, PrimeTime, and VCS, covering project setup, floorplan changes, implementation runs, parasitic extraction, timing signoff, ECO loops, and report checking.",
+    "developerName": "szj",
+    "category": "Coding",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "Run a Fusion Compiler step for this block.",
+      "Check timing and extraction reports for regressions.",
+      "Start an ECO loop and summarize the closure status."
+    ],
+    "brandColor": "#0F766E",
+    "screenshots": []
+  }
+}
