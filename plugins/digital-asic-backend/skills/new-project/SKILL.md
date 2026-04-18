@@ -37,23 +37,24 @@ test -f $PDK_PATH/pdk.md && echo "found" || echo "missing"
 
 | Variable | Description |
 |----------|-------------|
-| `LIBRARY_PATH` | PDK root path |
-| `DB_DIR` | Directory containing .db timing files |
-| `SDB_DIR` | Directory containing .sdb symbol files |
-| `TARGET_LIBRARY` | TT corner .db basename |
-| `SYMBOL_LIBRARY` | .sdb basename |
-| `NDM_REFERENCE_LIB` | Full path to standard cell NDM |
-| `NDM_REFERENCE_LIB_PHY_ONLY` | Full path to phy_only NDM |
-| `TECH_FILE` | Full path to .tf tech file |
-| `MAX_TLUPLUS_FILE` | Full path to worst-case TLU+ |
-| `TYP_TLUPLUS_FILE` | Full path to typical TLU+ |
-| `MIN_TLUPLUS_FILE` | Full path to best-case TLU+ |
-| `TLUPLUS_MAP_FILE` | Full path to TLU+ layer map |
-| `TCAD_GRD_WST` | Full path to worst-corner nxtgrd |
-| `TCAD_GRD_BST` | Full path to best-corner nxtgrd |
-| `DB_TT_FULL_PATH` | Full path to TT corner .db |
-| `DB_SS_FULL_PATH` | Full path to SS corner .db |
-| `ANTENNA_RULES_TCL` | Full path to antenna rules TCL |
+| `DB_DIR` | Relative path to directory containing .db timing files |
+| `SDB_DIR` | Relative path to directory containing .sdb symbol files |
+| `TARGET_LIBRARY` | TT corner .db basename (no path) |
+| `SYMBOL_LIBRARY` | .sdb basename (no path) |
+| `NDM_REFERENCE_LIB` | Relative path to standard cell NDM directory |
+| `NDM_REFERENCE_LIB_PHY_ONLY` | Relative path to phy_only NDM directory |
+| `TECH_FILE` | Relative path to .tf tech file |
+| `MAX_TLUPLUS_FILE` | Relative path to worst-case TLU+ |
+| `TYP_TLUPLUS_FILE` | Relative path to typical TLU+ |
+| `MIN_TLUPLUS_FILE` | Relative path to best-case TLU+ |
+| `TLUPLUS_MAP_FILE` | Relative path to TLU+ layer map |
+| `TCAD_GRD_WST` | Relative path to worst-corner nxtgrd |
+| `TCAD_GRD_BST` | Relative path to best-corner nxtgrd |
+| `DB_TT_FULL_PATH` | Relative path to TT corner .db |
+| `DB_SS_FULL_PATH` | Relative path to SS corner .db |
+| `ANTENNA_RULES_TCL` | Relative path to antenna rules TCL |
+
+All path values in `pdk.md` are relative to `$PDK_PATH`. After extracting each value, prepend `$PDK_PATH/` to obtain the absolute path for substitution. `LIBRARY_PATH` is always set to `$PDK_PATH` itself (the argument the user provided). `TARGET_LIBRARY` and `SYMBOL_LIBRARY` are basenames — use them as-is.
 
 If any variable has value `MISSING`, warn the user and ask whether to continue:
 
