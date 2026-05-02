@@ -1,7 +1,11 @@
 ######################################################################
-# Open Design
+# Open Design — copy from route so the source checkpoint stays clean
 ######################################################################
-open_block ${DESIGN_NAME}_route
+if {[sizeof_collection [get_blocks -quiet ${DESIGN_NAME}_dfm]] > 0} {
+    remove_block -force [get_blocks ${DESIGN_NAME}_dfm]
+}
+copy_block -from ${DESIGN_NAME}_route -to ${DESIGN_NAME}_dfm
+open_block ${DESIGN_NAME}_dfm
 
 
 ######################################################################
@@ -43,5 +47,5 @@ redirect -tee -file ../report/dfm_lvs.rpt {check_lvs}
 ######################################################################
 # Save DFM
 ######################################################################
-save_block -as ${DESIGN_NAME}_dfm
+save_block
 save_lib

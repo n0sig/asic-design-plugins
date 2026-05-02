@@ -1,7 +1,11 @@
 ######################################################################
-# Open Design
+# Open Design — copy from initial so the source checkpoint stays clean
 ######################################################################
-open_block ${DESIGN_NAME}_initial
+if {[sizeof_collection [get_blocks -quiet ${DESIGN_NAME}_floorplan]] > 0} {
+    remove_block -force [get_blocks ${DESIGN_NAME}_floorplan]
+}
+copy_block -from ${DESIGN_NAME}_initial -to ${DESIGN_NAME}_floorplan
+open_block ${DESIGN_NAME}_floorplan
 
 
 ######################################################################
@@ -60,22 +64,7 @@ set_pg_strategy pg_mesh_strategy \
     -extension {stop: outermost_ring} \
     -pattern {{pattern: pg_mesh_pattern} {nets: {VDD VSS}}}
 
-set_pg_strategy_via_rule pg_mesh_via_rule \
-    -via_rule {
-        {{{strategies: pg_mesh_strategy} {layers: METAL3}} {existing: ring} {via_master: default}} \
-        {{{strategies: pg_mesh_strategy} {layers: METAL4}} {existing: ring} {via_master: default}} \
-        {{{strategies: pg_mesh_strategy} {layers: METAL3}} {{strategies: pg_mesh_strategy} {layers: METAL4}} {via_master: default}} \
-        {{{existing: std_conn}} {{strategies: pg_mesh_strategy} {layers: METAL3}} {via_master: default}} \
-        {{intersection: adjacent} {via_master: default}}
-    }
-
-compile_pg -strategies pg_mesh_strategy \
-    -via_rule {pg_mesh_via_rule} \
-    -tag pg_mesh
-
-set_ignored_layers -min_routing_layer METAL1 -max_routing_layer METAL6
-
-compile_pg -strategies std_cell_strategy -tag pg_rail
+compile_pg -strategies pg_mesh_strategy -tag pg_mesh
 
 
 ######################################################################
@@ -87,6 +76,7 @@ create_pg_std_cell_conn_pattern std_cell_rail \
 
 set_pg_strategy std_cell_strategy \
     -core \
+    -extension {stop: outermost_ring} \
     -pattern {{pattern: std_cell_rail} {nets: VDD VSS}}
 
 compile_pg -strategies std_cell_strategy -tag pg_rail
@@ -101,5 +91,5 @@ set_ignored_layers -min_routing_layer METAL1 -max_routing_layer METAL6
 ######################################################################
 # Save Floorplan
 ######################################################################
-save_block -as ${DESIGN_NAME}_floorplan
+save_block
 save_lib

@@ -1,7 +1,11 @@
 ######################################################################
-# Open Design
+# Open Design — copy from placement so the source checkpoint stays clean
 ######################################################################
-open_block ${DESIGN_NAME}_placement
+if {[sizeof_collection [get_blocks -quiet ${DESIGN_NAME}_clocktree]] > 0} {
+    remove_block -force [get_blocks ${DESIGN_NAME}_clocktree]
+}
+copy_block -from ${DESIGN_NAME}_placement -to ${DESIGN_NAME}_clocktree
+open_block ${DESIGN_NAME}_clocktree
 
 
 ######################################################################
@@ -46,5 +50,5 @@ redirect -tee -file ../report/timing_clock_opt_hold.rpt {report_timing -delay_ty
 ######################################################################
 # Save Clock Tree
 ######################################################################
-save_block -as ${DESIGN_NAME}_clocktree
+save_block
 save_lib

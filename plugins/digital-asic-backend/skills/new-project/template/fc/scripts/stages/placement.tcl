@@ -4,9 +4,13 @@
 
 
 ######################################################################
-# Open Design
+# Open Design — copy from synthesis so the source checkpoint stays clean
 ######################################################################
-open_block ${DESIGN_NAME}_synthesis
+if {[sizeof_collection [get_blocks -quiet ${DESIGN_NAME}_placement]] > 0} {
+    remove_block -force [get_blocks ${DESIGN_NAME}_placement]
+}
+copy_block -from ${DESIGN_NAME}_synthesis -to ${DESIGN_NAME}_placement
+open_block ${DESIGN_NAME}_placement
 
 
 ######################################################################
@@ -30,5 +34,5 @@ redirect -tee -file ../report/placement_qor.rpt   {report_qor}
 ######################################################################
 # Save Placement
 ######################################################################
-save_block -as ${DESIGN_NAME}_placement
+save_block
 save_lib

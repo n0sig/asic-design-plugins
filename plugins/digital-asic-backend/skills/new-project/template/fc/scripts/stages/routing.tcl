@@ -1,7 +1,11 @@
 ######################################################################
-# Open Design
+# Open Design — copy from clocktree so the source checkpoint stays clean
 ######################################################################
-open_block ${DESIGN_NAME}_clocktree
+if {[sizeof_collection [get_blocks -quiet ${DESIGN_NAME}_route]] > 0} {
+    remove_block -force [get_blocks ${DESIGN_NAME}_route]
+}
+copy_block -from ${DESIGN_NAME}_clocktree -to ${DESIGN_NAME}_route
+open_block ${DESIGN_NAME}_route
 
 
 ######################################################################
@@ -55,5 +59,5 @@ check_lvs
 ######################################################################
 # Save Route
 ######################################################################
-save_block -as ${DESIGN_NAME}_route
+save_block
 save_lib

@@ -4,9 +4,13 @@
 
 
 ######################################################################
-# Open Design
+# Open Design — copy from floorplan so the source checkpoint stays clean
 ######################################################################
-open_block ${DESIGN_NAME}_floorplan
+if {[sizeof_collection [get_blocks -quiet ${DESIGN_NAME}_synthesis]] > 0} {
+    remove_block -force [get_blocks ${DESIGN_NAME}_synthesis]
+}
+copy_block -from ${DESIGN_NAME}_floorplan -to ${DESIGN_NAME}_synthesis
+open_block ${DESIGN_NAME}_synthesis
 
 
 ######################################################################
@@ -40,5 +44,5 @@ redirect -tee -file ../report/timing_synthesis.rpt {report_timing}
 redirect -tee -file ../report/qor_synthesis.rpt {report_qor}
 redirect -tee -file ../report/power_synthesis.rpt {report_power}
 
-save_block -as ${DESIGN_NAME}_synthesis
+save_block
 save_lib

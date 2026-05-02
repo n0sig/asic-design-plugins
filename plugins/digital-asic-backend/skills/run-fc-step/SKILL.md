@@ -31,6 +31,8 @@ Each step requires a checkpoint from the previous step:
 | `dfm` | `${DESIGN_NAME}_route` | `${DESIGN_NAME}_dfm` |
 | `output` | `${DESIGN_NAME}_dfm` | (writes files to fc/output/) |
 
+Each stage opens its required checkpoint as a **read-only source**, copies it to a fresh block named after the produced checkpoint, then opens that copy and operates on it. Re-running a stage removes its previous output block first and re-copies from the upstream checkpoint, so upstream blocks are never mutated. `eco` is the one exception — it intentionally edits `_dfm` in place across iterations.
+
 ## Pre-run Checks
 
 1. Verify the prerequisite checkpoint exists (except for `init`):
